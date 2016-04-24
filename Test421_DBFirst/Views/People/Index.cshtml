@@ -4,40 +4,89 @@
 @{
     ViewBag.Title = "Index";
     SortingPagingInfo info = ViewBag.SortingPagingInfo;
-    
-    
+
+    String searchName = ViewBag.SearchName;
+
 }
 
 <h2>Index</h2>
+<script src="/Scripts/jquery-1.10.2.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".header").click(function (evt) {
+            var sortfield = $(evt.target).data("sortfield");
+            if ($("#SortField").val() == sortfield) {
+                if ($("#SortDirection").val() == "ascending") {
+                    $("#SortDirection").val("descending");
+                }
+                else {
+                    $("#SortDirection").val("ascending");
+                }
+            }
+            else {
+                $("#SortField").val(sortfield);
+                $("#SortDirection").val("ascending");
+            }
+            evt.preventDefault();
+            $("#sortingForm").submit();
+        });
+
+        $(".pager").click(function (evt) {
+            var pageindex = $(evt.target).data("pageindex");
+            $("#CurrentPageIndex").val(pageindex);
+            evt.preventDefault();
+            $("#sortingForm").submit();
+        });
+    });
+
+</script>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
+@using (Html.BeginForm("Index", "People", FormMethod.Post, new { id = "sortingForm" }))
+{
+    @Html.Hidden("SortField", info.SortField);
+    @Html.Hidden("SortDirection", info.SortDirection)
+    @Html.Hidden("PageCount", info.PageCount)
+    @Html.Hidden("PageSize", info.PageSize)
+    @Html.Hidden("CurrentPageIndex", info.CurrentPageIndex)
+    @Html.Hidden("SearchName", searchName)
+
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.PersonType)
+            @*@Html.DisplayNameFor(model => model.PersonType)*@
+            <a href="#" data-sortfield="PersonType" class="header">PersonType</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.NameStyle)
+            @*@Html.DisplayNameFor(model => model.NameStyle)*@
+            <a href="#" data-sortfield="NameStyle" class="header">NameStyle</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Title)
+            @*@Html.DisplayNameFor(model => model.Title)*@
+            <a href="#" data-sortfield="Title" class="header">Title</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FirstName)
+            @*@Html.DisplayNameFor(model => model.FirstName)*@
+            <a href="#" data-sortfield="FirstName" class="header">FirstName</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.MiddleName)
+            @*@Html.DisplayNameFor(model => model.MiddleName)*@
+            <a href="#" data-sortfield="MiddleName" class="header">MiddleName</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.LastName)
+            @*@Html.DisplayNameFor(model => model.LastName)*@
+            <a href="#" data-sortfield="LastName" class="header">LastName</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Suffix)
+            @*@Html.DisplayNameFor(model => model.Suffix)*@
+            <a href="#" data-sortfield="Suffix" class="header">Suffix</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EmailPromotion)
+            @*@Html.DisplayNameFor(model => model.EmailPromotion)*@
+            <a href="#" data-sortfield="EmailPromotion" class="header">EmailPromotion</a>
         </th>
         @*<th>
             @Html.DisplayNameFor(model => model.AdditionalContactInfo)
@@ -49,12 +98,14 @@
             @Html.DisplayNameFor(model => model.rowguid)
         </th>*@
         <th>
-            @Html.DisplayNameFor(model => model.ModifiedDate)
+            @*@Html.DisplayNameFor(model => model.ModifiedDate)*@
+            <a href="#" data-sortfield="ModifiedDate" class="header">ModifiedDate</a>
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
+@foreach (var item in Model)
+{
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.PersonType)
@@ -93,11 +144,29 @@
             @Html.DisplayFor(modelItem => item.ModifiedDate)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.BusinessEntityID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.BusinessEntityID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.BusinessEntityID })
+            @Html.ActionLink("Edit", "Edit", new { id = item.BusinessEntityID }) |
+            @Html.ActionLink("Details", "Details", new { id = item.BusinessEntityID }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.BusinessEntityID })
         </td>
     </tr>
 }
+    <tr>
+        <td colspan="7">
+            @for(var i=0;i<Math.Min(info.PageCount,30);i++)
+            {
+                if (info.CurrentPageIndex == i)
+                {
+                            <span>@(i + 1)</span>
+                }
+                else
+                {
+                        <a href="#" data-pageindex="@i" class="pager">@(i + 1)</a>
+                }
+            }
+
+        </td>
+
+    </tr>
 
 </table>
+}

@@ -19,11 +19,12 @@ namespace Test421_DBFirst.Controllers
         {
 
             SortingPagingInfo info = new SortingPagingInfo();
-            info.SortDirection = "ascening";
+            info.SortDirection = "ascending";
             info.SortField = "LastName";
             info.PageSize = 10;
             info.PageCount = Convert.ToInt32(Math.Ceiling((double)db.People.Count()/info.PageSize));
-            info.CurrrentPageIndex = 0;
+            info.CurrentPageIndex = 0;
+
 
             var personList =  db.People.OrderBy(c=>c.LastName).Take(info.PageSize).ToList();
             ViewBag.SortingPagingInfo = info;
@@ -31,14 +32,115 @@ namespace Test421_DBFirst.Controllers
             return View(personList); ////
         }
 
-        public ActionResult Search(string searchName)
+        [HttpPost]
+        public ActionResult Index(SortingPagingInfo info, string searchName)
         {
-            var personList = from r in db.People
+            if (searchName != null && searchName != "")
+                return Search(info, searchName);
+
+            IQueryable<Person> personList = null;
+
+            bool bSortingAscending = info.SortDirection == "descending" ? false : true;
+            switch(info.SortField)
+            {
+                case "LastName":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.LastName) : db.People.OrderByDescending(c => c.LastName);
+                    break;
+                case "FirstName":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.FirstName) : db.People.OrderByDescending(c => c.FirstName);
+                    break;
+                case "PersonType":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.PersonType) : db.People.OrderByDescending(c => c.PersonType);
+                    break;
+                case "Title":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.Title) : db.People.OrderByDescending(c => c.Title);
+                    break;
+                case "NameStyle":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.NameStyle) : db.People.OrderByDescending(c => c.NameStyle);
+                    break;
+                case "MiddleName":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.MiddleName) : db.People.OrderByDescending(c => c.MiddleName);
+                    break;
+                case "Suffix":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.Suffix) : db.People.OrderByDescending(c => c.Suffix);
+                    break;
+                case "EmailPromotion":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.EmailPromotion) : db.People.OrderByDescending(c => c.EmailPromotion);
+                    break;
+                case "ModifiedDate":
+                    personList = bSortingAscending ? db.People.OrderBy(c => c.ModifiedDate) : db.People.OrderByDescending(c => c.ModifiedDate);
+                    break;
+            }
+
+            personList = personList.Skip(info.CurrentPageIndex * info.PageSize).Take(info.PageSize);
+            ViewBag.SortingPagingInfo = info;
+
+            return View(personList.ToList());
+        }
+
+        public ActionResult Search(SortingPagingInfo info , string searchName)
+        {
+            IQueryable<Person> personList = null;
+            personList = from r in db.People
                              where r.FirstName.Contains(searchName) || r.LastName.Contains(searchName)
-                             orderby r.LastName
-                             select r;
-            // return View(db.People.ToList());
-            return View("Index",personList.Take(100));
+                            select r;
+            
+            if (info.PageSize ==0) // no page information, need to create one
+            {
+                //personList = from r in db.People
+                //             where r.FirstName.Contains(searchName) || r.LastName.Contains(searchName)
+                //             orderby r.LastName
+                //             select r;
+    
+                info = new SortingPagingInfo();
+                // SortingPagingInfo info = new SortingPagingInfo();
+                info.SortDirection = "ascending";
+                info.SortField = "LastName";
+                info.PageSize = 10;
+                info.PageCount = Convert.ToInt32(Math.Ceiling((double)personList.Count() / info.PageSize));
+                info.CurrentPageIndex = 0;
+            }
+
+            bool bSortingAscending = info.SortDirection == "descending" ? false : true;
+            switch (info.SortField)
+            {
+                case "LastName":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.LastName) : personList.OrderByDescending(c => c.LastName);
+                    break;
+                case "FirstName":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.FirstName) : personList.OrderByDescending(c => c.FirstName);
+                    break;
+                case "PersonType":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.PersonType) : personList.OrderByDescending(c => c.PersonType);
+                    break;
+                case "Title":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.Title) : personList.OrderByDescending(c => c.Title);
+                    break;
+                case "NameStyle":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.NameStyle) : personList.OrderByDescending(c => c.NameStyle);
+                    break;
+                case "MiddleName":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.MiddleName) : personList.OrderByDescending(c => c.MiddleName);
+                    break;
+                case "Suffix":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.Suffix) : personList.OrderByDescending(c => c.Suffix);
+                    break;
+                case "EmailPromotion":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.EmailPromotion) : personList.OrderByDescending(c => c.EmailPromotion);
+                    break;
+                case "ModifiedDate":
+                    personList = bSortingAscending ? personList.OrderBy(c => c.ModifiedDate) : personList.OrderByDescending(c => c.ModifiedDate);
+                    break;
+            }
+
+
+
+
+            ViewBag.SortingPagingInfo = info;
+                ViewBag.SearchName = searchName;
+                // return View(db.People.ToList());
+                return View("Index", personList.Skip(info.CurrentPageIndex * info.PageSize).Take(info.PageSize));
+            
 
         }
 
