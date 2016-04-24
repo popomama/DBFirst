@@ -150,23 +150,21 @@
         </td>
     </tr>
 }
-    <tr>
-        <td colspan="7">
-            @for(var i=0;i<Math.Min(info.PageCount,30);i++)
-            {
-                if (info.CurrentPageIndex == i)
-                {
-                            <span>@(i + 1)</span>
-                }
-                else
-                {
-                        <a href="#" data-pageindex="@i" class="pager">@(i + 1)</a>
-                }
-            }
-
-        </td>
-
-    </tr>
-
+    
 </table>
+
+        for (var i = 0; i < Math.Min(info.PageCount, 30); i++)
+        {
+            if (info.CurrentPageIndex == i)
+            {
+                <span>@(i + 1)</span>
+            }
+            else
+            {
+                <a href="#" data-pageindex="@i" class="pager">@(i + 1)</a>
+            }
+        }
+
+
+
 }
