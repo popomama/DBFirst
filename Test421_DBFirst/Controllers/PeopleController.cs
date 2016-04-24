@@ -83,7 +83,7 @@ namespace Test421_DBFirst.Controllers
             IQueryable<Person> personList = null;
             personList = from r in db.People
                              where r.FirstName.Contains(searchName) || r.LastName.Contains(searchName)
-                            select r;
+                            select r; 
             
             if (info.PageSize ==0) // no page information, need to create one
             {
